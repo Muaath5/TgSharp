@@ -28,6 +28,8 @@ namespace TgSharp.TL
         public bool Quiz { get; set; }
         public string Question { get; set; }
         public TLVector<TLPollAnswer> Answers { get; set; }
+        public int ClosePeriod { get; set; }
+        public int ClosedDate { get; set; }
 
         public void ComputeFlags()
         {
@@ -44,6 +46,10 @@ namespace TgSharp.TL
             Quiz = (Flags & 8) != 0;
             Question = StringUtil.Deserialize(br);
             Answers = (TLVector<TLPollAnswer>)ObjectUtils.DeserializeVector<TLPollAnswer>(br);
+            if (Flags & 16 != 0)
+                ClosedPeriod = br.ReadInt32();
+            if (Flags & 32 != 0)
+                ClosedDate = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -53,6 +59,10 @@ namespace TgSharp.TL
             bw.Write(Flags);
             StringUtil.Serialize(Question, bw);
             ObjectUtils.SerializeObject(Answers, bw);
+            if (Flags & 16 != 0)
+                bw.Write(ClosedPeriod);
+            if (Flags & 32 != 0)
+                bw.Write(ClosedDate);
         }
     }
 }
